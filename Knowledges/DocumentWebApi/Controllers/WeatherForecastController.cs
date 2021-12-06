@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace DocumentWebApi.Controllers
 {
     using System.Threading.Tasks;
+    using System.Transactions;
 
     using Contracts;
 
@@ -39,8 +40,13 @@ namespace DocumentWebApi.Controllers
         public async Task<IEnumerable<WeatherForecast>> GetAsync()
         {
             var rng = new Random();
-            await _publishEndpoint.Publish<IDocumentActualized>(
-                new DocumentActualized() { DocumentId = Guid.NewGuid(), IsActual = true });
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                // TODO: business logic
+                await _publishEndpoint.Publish<IDocumentActualized>(
+                    new DocumentActualized() { DocumentId = Guid.NewGuid(), IsActual = true });
+                transaction.Complete();
+            }
 
             var result = await _requestClient.GetResponse<DocumentLinkCreateResponse>(
                              new DocumentLinkCreateRequest()

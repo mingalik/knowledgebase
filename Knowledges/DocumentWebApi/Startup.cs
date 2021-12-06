@@ -10,6 +10,7 @@ namespace DocumentWebApi
 
     using MassTransit;
     using MassTransit.Definition;
+    using MassTransit.Transactions;
 
     public class Startup
     {
@@ -55,6 +56,7 @@ namespace DocumentWebApi
                                         });
                                 return bus;
                             });
+                    a.AddTransactionalEnlistmentBus(); // дл€ отложенной отправки перед коммитом использу€ TransactionScope
                     a.AddRequestClient<DocumentLinkCreateRequest>();
                 });
 
