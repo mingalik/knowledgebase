@@ -6,10 +6,16 @@ using Microsoft.Extensions.Hosting;
 
 namespace DocumentValue
 {
+    using System.Reflection;
+
     using DocumentValueWebApi.Consumers;
 
     using global::MassTransit;
     using global::MassTransit.Definition;
+
+    using MediatR;
+
+    using Microsoft.OpenApi.Models;
 
     public class Startup
     {
@@ -23,6 +29,7 @@ namespace DocumentValue
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddControllers();
             ConfigureMassTransit(services);
         }
@@ -62,6 +69,15 @@ namespace DocumentValue
                     a.AddConsumer<DocumentActualizedConsumer>(typeof(DocumentActualizeConsumerDefinition));
                 });
             services.AddMassTransitHostedService();
+            services.AddSwaggerGen(options =>
+                {
+                    options.SwaggerDoc("v1", new OpenApiInfo
+                                                 {
+                                                     Title = "knowledge - DocumentValue HTTP API",
+                                                     Version = "v1",
+                                                     Description = "The Document Value Service HTTP API"
+                                                 });
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,11 +88,15 @@ namespace DocumentValue
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSwagger(c => c.RouteTemplate = "/{documentName}/swagger.json");
+            app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/v1/swagger.json", "IntegrationGateway");
+                });
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,33 +1,23 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DocumentWebApi.Controllers
+﻿namespace DocumentValueWebApi.Controllers
 {
-    public class DocumentValueControllerV2 : Controller
+    using System.Threading.Tasks;
+
+    using DocumentValueWebApi.Application.Commands;
+
+    using MediatR;
+
+    using Microsoft.AspNetCore.Mvc;
+
+    [ApiController]
+    [Route("[controller]")]
+    public class DocumentValueControllerV2 : ControllerBase
     {
         private readonly IMediator mediator;
 
-        public DocumentValueControllerV2(IMediator mediator) => mediator = mediator;
+        public DocumentValueControllerV2(IMediator mediator) => this.mediator = mediator;
 
         // POST: DocumentControllerV2/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                await mediator.Send(, HttpContext.RequestAborted);
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        public async Task<bool> Create([FromBody] DocumentValueCreateCommand command) => await mediator.Send(command, HttpContext.RequestAborted).ConfigureAwait(false);
     }
 }
