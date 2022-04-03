@@ -10,8 +10,7 @@ namespace DocumentValue
 
     using DocumentValueWebApi.Consumers;
 
-    using global::MassTransit;
-    using global::MassTransit.Definition;
+    using MassTransit;
 
     using MediatR;
 
@@ -59,16 +58,13 @@ namespace DocumentValue
                                                     });
                                             cfg.ConfigureEndpoints(busFactory, KebabCaseEndpointNameFormatter.Instance);
                                             cfg.UseJsonSerializer();
-                                            /* Один из вариантов регистрирования консюмера
-                                             cfg.ReceiveEndpoint(
+                                            cfg.ReceiveEndpoint(
                                         "DocumentActualized",
-                                        cfg => cfg.Consumer<DocumentActualizedConsumer>());*/
+                                        cfg => cfg.Consumer<DocumentActualizedConsumer>());
                                         });
                                 return bus;
                             });
-                    a.AddConsumer<DocumentActualizedConsumer>(typeof(DocumentActualizeConsumerDefinition));
                 });
-            services.AddMassTransitHostedService();
             services.AddSwaggerGen(options =>
                 {
                     options.SwaggerDoc("v1", new OpenApiInfo
